@@ -34,8 +34,8 @@ namespace MyCourse
             {
                 endpoints.MapGet("/", async context =>
                 {
-                    string nome = context.Request.Query["nome"]; //parametro di prova
-                    await context.Response.WriteAsync($"Hello World mio come stai? Io sono {nome}");
+                    string nome = context.Request.Query["nome"]; //parametro di provino
+                    await context.Response.WriteAsync($"Hello World mio come stai?!?? Io sono {nome}");
                 });
             });
         }
