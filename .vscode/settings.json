@@ -1,3 +1,7 @@
 {
-    "emmet.includeLanguages": { "aspnetcorerazor": "html"}
+    "emmet.includeLanguages": { "aspnetcorerazor": "html"},
+    "browserSync.config": {
+        "proxy": "http://localhost:5000",
+        "files": ["Views/**/*.cshtml", "wwwroot/**/*"]
+    }
 }
