@@ -18,7 +18,7 @@ namespace MyCourse
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddTransient<CourseService>();
+            services.AddTransient<ICourseService, CourseService>();
             services.AddRazorPages()
                 .AddRazorRuntimeCompilation();
         }
