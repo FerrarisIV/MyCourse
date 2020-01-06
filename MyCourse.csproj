@@ -6,12 +6,13 @@
 
   
   <ItemGroup>
-
     <Folder Include="wwwroot\" />
+    <Compile Remove="Models/Services/Application/CourseService.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <!--<PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.8" />-->
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.0" />
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="3.1.0" />
   </ItemGroup>
 
