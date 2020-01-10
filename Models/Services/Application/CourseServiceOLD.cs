@@ -33,7 +33,7 @@ namespace MyCourse.Models.Services.Application
         public CourseDetailViewModel GetCourse(int id)
         {
             var rand = new Random();
-            var price=Convert.ToDecimal(rand.NextDouble() * 10 + 10);
+            var price = Convert.ToDecimal(rand.NextDouble() * 10 + 10);
             var course = new CourseDetailViewModel
             {
                 Id = id,

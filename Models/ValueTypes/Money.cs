@@ -5,9 +5,7 @@ namespace MyCourse.Models.ValueTypes
 {
     public class Money
     {
-        public Money() : this(Currency.EUR, 0.00m)
-        {
-        }
+        public Money() : this(Currency.EUR, 0.00m){}
         public Money(Currency currency, decimal amount)
         {
             Amount = amount;
