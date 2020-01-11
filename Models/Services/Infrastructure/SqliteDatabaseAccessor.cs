@@ -8,14 +8,13 @@ namespace MyCourse.Models.Services.Infrastructure
     public class SqliteDatabaseAccessor : IDatabaseAccessor
     {
         public DataSet Query(FormattableString formattableQuery)
-        {
-            
+        {            
             var queryArguments = formattableQuery.GetArguments();
             var sqliteParameters = new List<SqliteParameter>();
             for (var i = 0; i < queryArguments.Length; i++)
             {
-                var parameter = new SqliteParameter(i.ToString(), queryArguments[i]);
-                sqliteParameters.Add(parameter);
+                //var parameter = new SqliteParameter(i.ToString(), queryArguments[i]);
+                sqliteParameters.Add(new SqliteParameter(i.ToString(), queryArguments[i]));
                 queryArguments[i] = "@" + i;
             }
             string query = formattableQuery.ToString();

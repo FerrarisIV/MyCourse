@@ -18,6 +18,7 @@ namespace MyCourse.Models.Services.Application {
                 FROM Courses WHERE Id = {id};
                 SELECT Id, Title, Description, Duration
                 FROM Lessons WHERE CourseId = {id}";
+
             DataSet dataSet = db.Query(query);
             var courseTable = dataSet.Tables[0];
             if (courseTable.Rows.Count != 1 )
