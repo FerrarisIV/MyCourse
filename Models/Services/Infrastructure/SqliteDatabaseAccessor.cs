@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 
 namespace MyCourse.Models.Services.Infrastructure
 {
     public class SqliteDatabaseAccessor : IDatabaseAccessor
     {
-        public DataSet Query(FormattableString formattableQuery)
+        public async Task<DataSet>QueryAsync(FormattableString formattableQuery)
         {            
             var queryArguments = formattableQuery.GetArguments();
             var sqliteParameters = new List<SqliteParameter>();
@@ -21,11 +22,11 @@ namespace MyCourse.Models.Services.Infrastructure
             
             using (var conn = new SqliteConnection("Data Source=Data/MyCourse.db"))
             {
-                conn.Open();
+                await conn.OpenAsync();
                 using(var cmd = new SqliteCommand(query, conn))
                 {
                     cmd.Parameters.AddRange(sqliteParameters);
-                    using (var reader = cmd.ExecuteReader())
+                    using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         var dataSet = new DataSet();
                         do
