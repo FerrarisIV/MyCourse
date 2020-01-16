@@ -40,7 +40,7 @@ namespace MyCourse.Models.Services.Infrastructure
                 entity.OwnsOne(course => course.CurrentPrice, builder => {
                     builder.Property(money => money.Currency)
                     .HasConversion<string>()
-                    .HasColumnName("CurrentPrice_Currerncy"); // ** Superfluo perché le due colonne seguono la convenzione dei nomi
+                    .HasColumnName("CurrentPrice_Currency"); // ** Superfluo perché le due colonne seguono la convenzione dei nomi
                     builder.Property(money => money.Amount).HasColumnName("CurrentPrice_Amount"); //Superfluo perché le due colonne seguono la convenzione dei nomi
                  });
 
@@ -102,8 +102,8 @@ namespace MyCourse.Models.Services.Infrastructure
             modelBuilder.Entity<Lesson>(entity =>
             {
 
-                /*entity.HasOne(lesson => lesson.Course)
-                    .WithMany(course => course.Lessons);*/
+                entity.HasOne(lesson => lesson.Course)
+                    .WithMany(course => course.Lessons);
 
                 #region Mapping generato automaticamente dal tool di reverse engineering 
                 /*

@@ -32,6 +32,7 @@ namespace MyCourse.Models.Services.Application
                 CurrentPrice = course.CurrentPrice,
                 FullPrice = course.FullPrice
             })
+            .AsNoTracking()
             .ToListAsync();
 
             return courses;
