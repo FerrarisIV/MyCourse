@@ -19,8 +19,10 @@ namespace MyCourse
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddTransient<ICourseService, AdoNetCourseService>();
+            //services.AddTransient<ICourseService, AdoNetCourseService>();
+            services.AddTransient<ICourseService, EfCoreCourseService>();
             services.AddTransient<IDatabaseAccessor, SqliteDatabaseAccessor>();
+            services.AddDbContext<MyCourseDbContext>();
 
             services.AddRazorPages()
                 .AddRazorRuntimeCompilation();

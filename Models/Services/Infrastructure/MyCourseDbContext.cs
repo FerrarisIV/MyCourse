@@ -16,8 +16,8 @@ namespace MyCourse.Models.Services.Infrastructure
         {
         }
 
-        public virtual DbSet<Courses> Courses { get; set; }
-        public virtual DbSet<Lessons> Lessons { get; set; }
+        public virtual DbSet<Course> Courses { get; set; }
+        public virtual DbSet<Lesson> Lessons { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -30,8 +30,32 @@ namespace MyCourse.Models.Services.Infrastructure
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Courses>(entity =>
+            modelBuilder.Entity<Course>(entity =>
             {
+                entity.ToTable("Courses"); //superfluo in questo caso perché la tabella si chiama come la propriertà che espone il DbSet qui sopra
+                entity.HasKey(course => course.Id); //superfluo in questo caso se la proprietà si chiama Id oppure CoursesId (NometabellaId)
+                //in caso di Key con più colonne: entity.HasKey(course => new {course.Id, course.Title, ecc.} );
+
+                //Mapping per gli owned types
+                entity.OwnsOne(course => course.CurrentPrice, builder => {
+                    builder.Property(money => money.Currency)
+                    .HasConversion<string>()
+                    .HasColumnName("CurrentPrice_Currerncy"); // ** Superfluo perché le due colonne seguono la convenzione dei nomi
+                    builder.Property(money => money.Amount).HasColumnName("CurrentPrice_Amount"); //Superfluo perché le due colonne seguono la convenzione dei nomi
+                 });
+
+                entity.OwnsOne(course => course.FullPrice, builder => {
+                    builder.Property(money => money.Currency).HasConversion<string>(); // ** appunto, qui ho omesso le specifiche superflue
+                 });
+
+                //Mapping per le relazioni
+                entity.HasMany(course => course.Lessons)
+                    .WithOne(lesson => lesson.Course)
+                    .HasForeignKey(lesson => lesson.CourseId); //superfluo in questo caso se la proprietà si chiama Id oppure CoursesId (NometabellaId)
+
+
+                #region Mapping generato automaticamente dal tool di reverse engineering
+                /*
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.Property(e => e.Author)
@@ -71,10 +95,18 @@ namespace MyCourse.Models.Services.Infrastructure
                 entity.Property(e => e.Title)
                     .IsRequired()
                     .HasColumnType("TEXT (100)");
+                */
+            #endregion
             });
 
-            modelBuilder.Entity<Lessons>(entity =>
+            modelBuilder.Entity<Lesson>(entity =>
             {
+
+                /*entity.HasOne(lesson => lesson.Course)
+                    .WithMany(course => course.Lessons);*/
+
+                #region Mapping generato automaticamente dal tool di reverse engineering 
+                /*
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.Property(e => e.Description).HasColumnType("TEXT (1000)");
@@ -91,6 +123,8 @@ namespace MyCourse.Models.Services.Infrastructure
                 entity.HasOne(d => d.Course)
                     .WithMany(p => p.Lessons)
                     .HasForeignKey(d => d.CourseId);
+                */
+                #endregion
             });
 
             OnModelCreatingPartial(modelBuilder);
