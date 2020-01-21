@@ -22,7 +22,8 @@ namespace MyCourse.Models.Services.Application
 
         public async Task<List<CourseViewModel>> GetCoursesAsync()
         {
-            List<CourseViewModel> courses = await dbContext.Courses.Select(course =>
+            List<CourseViewModel> courses = await dbContext.Courses
+            .Select(course =>
             new CourseViewModel {
                 Id = course.Id,
                 Title = course.Title,
