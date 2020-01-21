@@ -49,18 +49,6 @@ namespace MyCourse.Models.Services.Application
 
         public async Task<List<CourseViewModel>> GetCoursesAsync()
         {
-<<<<<<< HEAD
-            List<CourseViewModel> courses = await dbContext.Courses
-            .Select(course =>
-            new CourseViewModel {
-                Id = course.Id,
-                Title = course.Title,
-                ImagePath = course.ImagePath,
-                Author = course.Author,
-                Rating = course.Rating,
-                CurrentPrice = course.CurrentPrice,
-                FullPrice = course.FullPrice
-=======
             IQueryable<CourseViewModel> queryLink = dbContext.Courses
                 .Select(course => new CourseViewModel {
                     Id = course.Id,
@@ -70,7 +58,6 @@ namespace MyCourse.Models.Services.Application
                     Rating = course.Rating,
                     CurrentPrice = course.CurrentPrice,
                     FullPrice = course.FullPrice
->>>>>>> b15d26d300ac54118ce641c11130738b91ca2597
             })
             .AsNoTracking();
 
