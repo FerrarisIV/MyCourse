@@ -15,13 +15,41 @@ namespace MyCourse.Models.Services.Application
         {
             this.dbContext = dbContext;
         }
-        public Task<CourseDetailViewModel> GetCourseAsync(int id)
+        public async Task<CourseDetailViewModel> GetCourseAsync(int id)
         {
-            throw new System.NotImplementedException();
+            CourseDetailViewModel ViewModel = await dbContext.Courses
+                .Where(course => course.Id == id)
+                .Select(course => new CourseDetailViewModel
+                {
+                    Id = course.Id,
+                    Title = course.Title,
+                    ImagePath = course.ImagePath,
+                    Author = course.Author,
+                    Description = course.Description,
+                    Rating = course.Rating,
+                    CurrentPrice = course.CurrentPrice,
+                    FullPrice = course.FullPrice,
+                    Lessons = course.Lessons.Select(lesson => new LessonViewModel
+                    {
+                        Id = lesson.Id,
+                        Title = lesson.Title,
+                        Description = lesson.Description,
+                        Duration = lesson.Duration
+                    })
+                    .ToList()
+                })
+                //.FirstOrDefaultAsync(); è il più tollerante tra i metodi, restituisce null se l'elenco è vuoto e non solleva mai un'eccezione
+                //.FirstAsync(); FirstAsync restituisce, di un elenco, il primo elmento, sollevando un'eccezione solo se l'elenco è vuoto.
+                //.SingleOrDefaultAsync(); a differenza di SingleAsync tollera il fatto che l'elenco sia vuoto (restituendo null)
+                .AsNoTracking()
+                .SingleAsync(); //SingleAsync solleva invece un'eccezione se il risultato NON è 1
+
+            return ViewModel;
         }
 
         public async Task<List<CourseViewModel>> GetCoursesAsync()
         {
+<<<<<<< HEAD
             List<CourseViewModel> courses = await dbContext.Courses
             .Select(course =>
             new CourseViewModel {
@@ -32,11 +60,24 @@ namespace MyCourse.Models.Services.Application
                 Rating = course.Rating,
                 CurrentPrice = course.CurrentPrice,
                 FullPrice = course.FullPrice
+=======
+            IQueryable<CourseViewModel> queryLink = dbContext.Courses
+                .Select(course => new CourseViewModel {
+                    Id = course.Id,
+                    Title = course.Title,
+                    ImagePath = course.ImagePath,
+                    Author = course.Author,
+                    Rating = course.Rating,
+                    CurrentPrice = course.CurrentPrice,
+                    FullPrice = course.FullPrice
+>>>>>>> b15d26d300ac54118ce641c11130738b91ca2597
             })
-            .AsNoTracking()
-            .ToListAsync();
+            .AsNoTracking();
 
-            return courses;
+            List<CourseViewModel> courses = await queryLink
+                .ToListAsync();
+
+        return courses;
         }
     }
 }
