@@ -18,7 +18,8 @@ namespace MyCourse.Models.Services.Application
         public async Task<CourseDetailViewModel> GetCourseAsync(int id)
         {
             CourseDetailViewModel ViewModel = await dbContext.Courses
-                .Where(course => course.Id == id)
+                .AsNoTracking()
+                .Where(course => course.Id == id && course.Email == "fjadofjap")
                 .Select(course => new CourseDetailViewModel
                 {
                     Id = course.Id,
@@ -41,7 +42,6 @@ namespace MyCourse.Models.Services.Application
                 //.FirstOrDefaultAsync(); è il più tollerante tra i metodi, restituisce null se l'elenco è vuoto e non solleva mai un'eccezione
                 //.FirstAsync(); FirstAsync restituisce, di un elenco, il primo elmento, sollevando un'eccezione solo se l'elenco è vuoto.
                 //.SingleOrDefaultAsync(); a differenza di SingleAsync tollera il fatto che l'elenco sia vuoto (restituendo null)
-                .AsNoTracking()
                 .SingleAsync(); //SingleAsync solleva invece un'eccezione se il risultato NON è 1
 
             return ViewModel;
