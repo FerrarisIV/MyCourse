@@ -19,7 +19,7 @@ namespace MyCourse.Models.Services.Application
         {
             CourseDetailViewModel ViewModel = await dbContext.Courses
                 .AsNoTracking()
-                .Where(course => course.Id == id && course.Email == "fjadofjap")
+                .Where(course => course.Id == id)
                 .Select(course => new CourseDetailViewModel
                 {
                     Id = course.Id,
