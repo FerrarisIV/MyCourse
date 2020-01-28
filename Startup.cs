@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MyCourse.Models.Services.Application;
 using MyCourse.Models.Services.Infrastructure;
+using MyCourse.Models.Options;
 
 namespace MyCourse
 {
@@ -39,6 +40,10 @@ namespace MyCourse
 
             services.AddRazorPages()
                 .AddRazorRuntimeCompilation();
+
+            //Options
+            services.Configure<ConnectionStringsOptions>(Configuration.GetSection("ConnectionStrings"));
+            services.Configure<CoursesOptions>(Configuration.GetSection("Courses"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

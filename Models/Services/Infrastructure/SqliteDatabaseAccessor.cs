@@ -3,13 +3,23 @@ using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using MyCourse.Models.Options;
 
 namespace MyCourse.Models.Services.Infrastructure
 {
     public class SqliteDatabaseAccessor : IDatabaseAccessor
     {
-        public async Task<DataSet>QueryAsync(FormattableString formattableQuery)
-        {            
+        private readonly IOptionsMonitor<ConnectionStringsOptions> connectionStringOptions;
+        public SqliteDatabaseAccessor(IOptionsMonitor<ConnectionStringsOptions> connectionStringOptions)
+        {
+            this.connectionStringOptions = connectionStringOptions;
+
+        }
+
+        public async Task<DataSet> QueryAsync(FormattableString formattableQuery)
+        {
             var queryArguments = formattableQuery.GetArguments();
             var sqliteParameters = new List<SqliteParameter>();
             for (var i = 0; i < queryArguments.Length; i++)
@@ -19,11 +29,13 @@ namespace MyCourse.Models.Services.Infrastructure
                 queryArguments[i] = "@" + i;
             }
             string query = formattableQuery.ToString();
-            
-            using (var conn = new SqliteConnection("Data Source=Data/MyCourse.db"))
+
+            string connectionString = connectionStringOptions.CurrentValue.Default;
+
+            using (var conn = new SqliteConnection(connectionString))
             {
                 await conn.OpenAsync();
-                using(var cmd = new SqliteCommand(query, conn))
+                using (var cmd = new SqliteCommand(query, conn))
                 {
                     cmd.Parameters.AddRange(sqliteParameters);
                     using (var reader = await cmd.ExecuteReaderAsync())
