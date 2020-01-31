@@ -50,9 +50,14 @@ namespace MyCourse
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
+            {     
+                app.UseExceptionHandler("/Error");           
+                //app.UseDeveloperExceptionPage();
                 //app.UseHttpsRedirection();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Error");
             }
 
             app.UseStaticFiles();
