@@ -12,6 +12,8 @@ using Microsoft.Extensions.Hosting;
 using MyCourse.Models.Services.Application;
 using MyCourse.Models.Services.Infrastructure;
 using MyCourse.Models.Options;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MyCourse
 {
@@ -27,10 +29,19 @@ namespace MyCourse
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddMvc(options => 
+                {
+                    var homeProfile = new CacheProfile();
+                    //homeProfile.Duration = Configuration.GetValue<int>("ResponseCache:Home:Duration");
+                    //homeProfile.Location = Configuration.GetValue<ResponseCacheLocation>("ResponseCache:Home:Location")
+                    Configuration.Bind("ResponseCache:Home", homeProfile);
+                    options.CacheProfiles.Add("Home", homeProfile);
+                }
+            );
             services.AddTransient<ICourseService, AdoNetCourseService>();
             //services.AddTransient<ICourseService, EfCoreCourseService>();
             services.AddTransient<IDatabaseAccessor, SqliteDatabaseAccessor>();
+            services.AddTransient<ICachedCourseService, MemoryCacheCourseService>();
             
             //services.AddDbContext<MyCourseDbContext>();
             services.AddDbContextPool<MyCourseDbContext>(optionsBuilder => {
@@ -44,6 +55,8 @@ namespace MyCourse
             //Options
             services.Configure<ConnectionStringsOptions>(Configuration.GetSection("ConnectionStrings"));
             services.Configure<CoursesOptions>(Configuration.GetSection("Courses"));
+
+            services.Configure<MemoryCacheOptions>(Configuration.GetSection("MemoryCache"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -9,10 +9,12 @@ namespace MyCourse.Controllers
     public class CoursesController : Controller
     {
         private readonly ICourseService courseService;
-        public CoursesController(ICourseService courseService)
+        public CoursesController(ICachedCourseService courseService)
+        //public CoursesController(ICourseService courseService)
         {
             this.courseService = courseService;
         }
+
         public async Task<IActionResult> Index()
         {
             ViewData["Title"] = "Catalogo dei corsi";
@@ -20,11 +22,11 @@ namespace MyCourse.Controllers
             return View(courses);
         }
 
-         public async Task<IActionResult> Detail(int id)
-         {
-             CourseDetailViewModel viewModel = await courseService.GetCourseAsync(id);
-             ViewData["Title"] = viewModel.Title;
-             return View(viewModel);
-         } 
+        public async Task<IActionResult> Detail(int id)
+        {
+            CourseDetailViewModel viewModel = await courseService.GetCourseAsync(id);
+            ViewData["Title"] = viewModel.Title;
+            return View(viewModel);
+        }
     }
 }
