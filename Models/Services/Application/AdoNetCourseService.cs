@@ -57,12 +57,17 @@ namespace MyCourse.Models.Services.Application
 
         }
 
-        public async Task<List<CourseViewModel>> GetCoursesAsync()
+        public async Task<List<CourseViewModel>> GetCoursesAsync(string search, int page)
         {
+            page = Math.Max(1, page);
+            int limit = coursesOptions.CurrentValue.PerPage;
+            int offset = (page - 1) * limit;
 
             FormattableString query = $@"SELECT Id, Title, ImagePath, Rating, Author, FullPrice_Amount, 
                 CurrentPrice_Amount, FullPrice_Currency, CurrentPrice_Currency
-                FROM Courses";
+                FROM Courses
+                WHERE Title LIKE {"%"+ search + "%"} 
+                LIMIT {limit} OFFSET {offset}";
             DataSet dataSet = await db.QueryAsync(query);
             var dataTable = dataSet.Tables[0];
             var courseList = new List<CourseViewModel>();

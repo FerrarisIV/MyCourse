@@ -1,18 +1,24 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using MyCourse.Models.Options;
 using MyCourse.Models.Services.Infrastructure;
 using MyCourse.Models.ViewModels;
 
 namespace MyCourse.Models.Services.Application
 {
+    
     public class EfCoreCourseService : ICourseService
     {
         private readonly MyCourseDbContext dbContext;
+        private readonly IOptionsMonitor<CoursesOptions> coursesOptions;
 
-        public EfCoreCourseService(MyCourseDbContext dbContext)
+        public EfCoreCourseService(MyCourseDbContext dbContext, IOptionsMonitor<CoursesOptions> coursesOptions)
         {
+            this.coursesOptions = coursesOptions;
             this.dbContext = dbContext;
         }
         public async Task<CourseDetailViewModel> GetCourseAsync(int id)
@@ -47,8 +53,13 @@ namespace MyCourse.Models.Services.Application
             return ViewModel;
         }
 
-        public async Task<List<CourseViewModel>> GetCoursesAsync()
+        public async Task<List<CourseViewModel>> GetCoursesAsync(string search, int page)
         {
+            page = Math.Max(1, page);
+            int limit = coursesOptions.CurrentValue.PerPage;
+            int offset = (page - 1) * limit;
+            
+            search = search ?? ""; //se search vale null viene sostituito dalle virgolette, in questo modo non si invalida la query
             IQueryable<CourseViewModel> queryLink = dbContext.Courses
                 .Select(course => new CourseViewModel {
                     Id = course.Id,
@@ -58,8 +69,11 @@ namespace MyCourse.Models.Services.Application
                     Rating = course.Rating,
                     CurrentPrice = course.CurrentPrice,
                     FullPrice = course.FullPrice
-            })
-            .AsNoTracking();
+                })
+                .Where(course => course.Title.Contains(search))
+                .Skip(offset)
+                .Take(limit)
+                .AsNoTracking();
 
             List<CourseViewModel> courses = await queryLink
                 .ToListAsync();
