@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MyCourse.Models.Exceptions;
 using MyCourse.Models.Options;
 using MyCourse.Models.Services.Infrastructure;
+using MyCourse.Models.ValueTypes;
 using MyCourse.Models.ViewModels;
+using MyCourse.Models.InputModels;
 
 namespace MyCourse.Models.Services.Application
 {
@@ -57,17 +60,17 @@ namespace MyCourse.Models.Services.Application
 
         }
 
-        public async Task<List<CourseViewModel>> GetCoursesAsync(string search, int page)
+        public async Task<List<CourseViewModel>> GetCoursesAsync(CourseListInputModel model)
         {
-            page = Math.Max(1, page);
-            int limit = coursesOptions.CurrentValue.PerPage;
-            int offset = (page - 1) * limit;
+            string orderby = model.OrderBy == "CurrentPrice" ? "CurrentPrice_Amount" : model.OrderBy;
+            string direction = model.Ascending ? "ASC" : "DESC";
 
             FormattableString query = $@"SELECT Id, Title, ImagePath, Rating, Author, FullPrice_Amount, 
                 CurrentPrice_Amount, FullPrice_Currency, CurrentPrice_Currency
                 FROM Courses
-                WHERE Title LIKE {"%"+ search + "%"} 
-                LIMIT {limit} OFFSET {offset}";
+                WHERE Title LIKE {"%"+ model.Search + "%"}
+                ORDER BY {(Sql) orderby} {(Sql) direction}
+                LIMIT {model.Limit} OFFSET {model.Offset}";
             DataSet dataSet = await db.QueryAsync(query);
             var dataTable = dataSet.Tables[0];
             var courseList = new List<CourseViewModel>();
