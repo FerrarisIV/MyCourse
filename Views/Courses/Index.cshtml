@@ -35,7 +35,7 @@
     <div class="col-md-2"></div>
 </div>
 
-@foreach (CourseViewModel course in Model.Courses)
+@foreach (CourseViewModel course in Model.Courses.Results)
 {
     <div class="row">
         <div class="col-md-1">
@@ -75,27 +75,52 @@
     </div>
 }
 
+@{
+    int TotalPages = (int) Math.Ceiling(Model.Courses.TotalCount / (decimal) Model.Input.Limit);
+    int CurrrentPage = Model.Input.Page;
+}
 <nav aria-label="Page navigation example">
     <ul class="pagination d-flex justify-content-center mt-3">
         
-        <li class="page-item disabled">
-            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-        </li>
-        
-        <li class="page-item active" aria-current="page">
-            <a class="page-link" asp-route-page="1">1<span class="sr-only">(current)</span></a>
-        </li>
-        
-        <li class="page-item">
-            <a class="page-link" asp-route-page="2">2</a>
-        </li>
-        
-        <li class="page-item">
-            <a class="page-link" asp-route-page="3">3</a>
-        </li>
-        
-        <li class="page-item">
-            <a class="page-link" href="#">Next</a>
-        </li>
+
+
+        @if(CurrrentPage > 1)
+        {
+            <li class="page-item">
+                <a class="page-link" asp-route-page="1" asp-route-search="@Model.Input.Search" asp-route-orderby="@Model.Input.OrderBy" asp-route-ascending="@Model.Input.Ascending"><i class="fas fa-angle-double-left"></i></a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" asp-route-page="@(CurrrentPage-1)" asp-route-search="@Model.Input.Search" asp-route-orderby="@Model.Input.OrderBy" asp-route-ascending="@Model.Input.Ascending"><i class="fas fa-angle-left"></i></a>
+            </li>
+            <p>&nbsp;&nbsp;&nbsp;</p>
+        }
+
+        @for(int p = Math.Max(1, CurrrentPage-4); p <= Math.Min(TotalPages, CurrrentPage+4); p++)
+        {
+            if (p == CurrrentPage)
+            {
+                <li class="page-item active" aria-current="page">
+                    <a class="page-link" asp-route-page="@p" asp-route-search="@Model.Input.Search" asp-route-orderby="@Model.Input.OrderBy" asp-route-ascending="@Model.Input.Ascending">@p<span class="sr-only">(current)</span></a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-route-page="@p" asp-route-search="@Model.Input.Search" asp-route-orderby="@Model.Input.OrderBy" asp-route-ascending="@Model.Input.Ascending">@p</a>
+                </li>
+            }
+        }
+
+        @if(CurrrentPage < TotalPages)
+        {
+            <p>&nbsp;&nbsp;&nbsp;</p>
+            <li class="page-item">
+                <a class="page-link" asp-route-page="@(CurrrentPage+1)" asp-route-search="@Model.Input.Search" asp-route-orderby="@Model.Input.OrderBy" asp-route-ascending="@Model.Input.Ascending"><i class="fas fa-angle-right"></i></a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" asp-route-page="@TotalPages" asp-route-search="@Model.Input.Search" asp-route-orderby="@Model.Input.OrderBy" asp-route-ascending="@Model.Input.Ascending"><i class="fas fa-angle-double-right"></i></a>
+            </li>
+        }
+                
     </ul>
 </nav>
