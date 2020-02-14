@@ -17,7 +17,7 @@ namespace MyCourse.Controllers
                     Response.StatusCode = 404;
                     return View("CourseNotFound");
                 default:
-                    ViewData["Title"] = "Errore";
+                    ViewData["Title"] = feature.Error ;
                     return View();
             }
 

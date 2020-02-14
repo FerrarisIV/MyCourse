@@ -29,6 +29,7 @@ namespace MyCourse
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            
             services.AddResponseCaching();
 
             services.AddMvc(options => 
@@ -45,7 +46,9 @@ namespace MyCourse
             services.AddTransient<ICourseService, AdoNetCourseService>();
             //services.AddTransient<ICourseService, EfCoreCourseService>();
             services.AddTransient<IDatabaseAccessor, SqliteDatabaseAccessor>();
-            services.AddTransient<ICachedCourseService, MemoryCacheCourseService>();
+            //services.AddTransient<ICachedCourseService, MemoryCacheCourseService>();
+
+            
             
             //services.AddDbContext<MyCourseDbContext>();
             services.AddDbContextPool<MyCourseDbContext>(optionsBuilder => {
