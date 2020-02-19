@@ -37,9 +37,14 @@ namespace MyCourse
                     Configuration.Bind("ResponseCache:Home", homeProfile);
                     options.CacheProfiles.Add("Home", homeProfile);
                 }
-            );
-            services.AddTransient<ICourseService, AdoNetCourseService>();
-            //services.AddTransient<ICourseService, EfCoreCourseService>();
+            )
+            #if DEBUG
+            .AddRazorRuntimeCompilation()
+            #endif
+            ;
+
+            //services.AddTransient<ICourseService, AdoNetCourseService>();
+            services.AddTransient<ICourseService, EfCoreCourseService>();
             services.AddTransient<IDatabaseAccessor, SqliteDatabaseAccessor>();
             //services.AddTransient<ICachedCourseService, MemoryCacheCourseService>();
 
@@ -51,8 +56,8 @@ namespace MyCourse
                 optionsBuilder.UseSqlite(connectionString);
             });
 
-            services.AddRazorPages()
-                .AddRazorRuntimeCompilation();
+            
+                
 
             //Options
             services.Configure<ConnectionStringsOptions>(Configuration.GetSection("ConnectionStrings"));

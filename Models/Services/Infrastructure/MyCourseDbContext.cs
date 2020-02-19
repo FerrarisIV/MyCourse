@@ -28,7 +28,10 @@ namespace MyCourse.Models.Services.Infrastructure
                     builder.Property(money => money.Currency)
                     .HasConversion<string>()
                     .HasColumnName("CurrentPrice_Currency"); // ** Superfluo perché le due colonne seguono la convenzione dei nomi
-                    builder.Property(money => money.Amount).HasColumnName("CurrentPrice_Amount"); //Superfluo perché le due colonne seguono la convenzione dei nomi
+                    
+                    builder.Property(money => money.Amount)
+                    .HasConversion<float>()
+                    .HasColumnName("CurrentPrice_Amount"); //Superfluo perché le due colonne seguono la convenzione dei nomi
                  });
 
                 entity.OwnsOne(course => course.FullPrice, builder => {

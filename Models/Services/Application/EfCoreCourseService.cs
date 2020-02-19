@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -112,11 +111,11 @@ namespace MyCourse.Models.Services.Application
                 case "CurrentPrice":
                     if (model.Ascending)
                     {
-                        baseQuery = baseQuery.OrderBy(course => course.CurrentPrice.Currency);
+                        baseQuery = baseQuery.OrderBy(course => course.CurrentPrice.Amount);
                     }
                     else
                     {
-                        baseQuery = baseQuery.OrderByDescending(course => course.CurrentPrice.Currency);
+                        baseQuery = baseQuery.OrderByDescending(course => course.CurrentPrice.Amount);
                     }
                     break;
                 case "Id":
