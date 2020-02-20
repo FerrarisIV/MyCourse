@@ -1,6 +1,6 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using MyCourse.Models.Exceptions;
 using MyCourse.Models.InputModels;
 using MyCourse.Models.Services.Application;
 using MyCourse.Models.ViewModels;
@@ -35,5 +35,22 @@ namespace MyCourse.Controllers
             ViewData["Title"] = viewModel.Title;
             return View(viewModel);
         }
+
+        public IActionResult Create()
+        {
+            
+            var inputModel = new CourseCreateInputModel();
+            ViewData["Title"] = "Nuovo corso";
+            return View(inputModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(CourseCreateInputModel inputModel)
+        {
+            CourseDetailViewModel course = await courseService.CreateCourseAsync(inputModel);
+
+            return RedirectToAction(nameof(Index));
+        }
+
     }
 }
