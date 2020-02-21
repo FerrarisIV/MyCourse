@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MyCourse.Models.Exceptions;
@@ -47,10 +48,60 @@ namespace MyCourse.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CourseCreateInputModel inputModel)
         {
-            CourseDetailViewModel course = await courseService.CreateCourseAsync(inputModel);
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    CourseDetailViewModel course = await courseService.CreateCourseAsync(inputModel);
 
-            return RedirectToAction(nameof(Index));
+                    TempData["ConfirmationMessage"] = "Hai creato il corso, bene!!! Aggiungi altre informazioni...";
+                    return RedirectToAction(nameof(Detail), new { id = course.Id });
+                }
+                catch (CourseTitleUnavailableException)
+                {
+                    ModelState.AddModelError(nameof(CourseDetailViewModel.Title), "Questo titolo già c'è!");
+                }
+            }
+
+            ViewData["Title"] = "Nuovo corso";
+            return View(inputModel);
+
+        }
+
+        public async Task<IActionResult> IsTitleAvailable(string title, int id = 0)
+        {
+            bool result = await courseService.IsTitleAvailableAsync(title, id);
+            return Json(result);
+        }
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            ViewData["Title"] = "Modifica corso";
+            CourseEditInputModel inputModel = await courseService.GetCourseForEditingAsync(id);
+            return View(inputModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(CourseEditInputModel inputModel)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    CourseDetailViewModel course = await courseService.EditCourseAsync(inputModel);
+                    TempData["ConfirmationMessage"] = "I dati sono stati salvati con successo";
+                    return RedirectToAction(nameof(Detail), new { id = inputModel.Id });
+                }
+                catch (CourseTitleUnavailableException)
+                {
+                    ModelState.AddModelError(nameof(CourseDetailViewModel.Title), "Questo titolo già esiste");
+                }
+            }
+
+            ViewData["Title"] = "Modifica corso";
+            return View(inputModel);
         }
 
     }
+
 }

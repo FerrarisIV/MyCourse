@@ -9,13 +9,13 @@ namespace MyCourse.Models.Entities
     {
         public Course(string title, string author)
         {
-            if (string.IsNullOrWhiteSpace(title))
+		    if (string.IsNullOrWhiteSpace(title))
             {
-                throw new ArgumentException("Manca il titolo");
+                throw new ArgumentException("The course must have a title");
             }
-            if (string.IsNullOrWhiteSpace(author))
+			if (string.IsNullOrWhiteSpace(author))
             {
-                throw new ArgumentException("Manca l'autore");
+                throw new ArgumentException("The course must have an author");
             }
 
             Title = title;
@@ -36,34 +36,58 @@ namespace MyCourse.Models.Entities
         public Money FullPrice { get; private set; }
         public Money CurrentPrice { get; private set; }
 
-        public virtual ICollection<Lesson> Lessons { get; private set; }
-
-
         public void ChangeTitle(string newTitle)
         {
             if (string.IsNullOrWhiteSpace(newTitle))
             {
-                throw new ArgumentException("Manca il titolo");
+                throw new ArgumentException("The course must have a title");
             }
             Title = newTitle;
         }
 
-        public void ChangePrices(Money newFullPrice, Money newDiscountPrice)
+        public void ChangePrices(Money newFullPrice, Money newCurrentPrice)
         {
-            if (newFullPrice == null || newDiscountPrice == null)
+            if (newFullPrice == null || newCurrentPrice == null)
             {
-                throw new ArgumentException("I valori non possono essere nulli");
+                throw new ArgumentException("Prices can't be null");
             }
-            if (newFullPrice.Currency != newDiscountPrice.Currency)
+            if (newFullPrice.Currency != newCurrentPrice.Currency)
             {
-                throw new ArgumentException("Le valute non corrispondono");
+                throw new ArgumentException("Currencies don't match");
             }
-            if (newFullPrice.Amount < newDiscountPrice.Amount )
+            if (newFullPrice.Amount < newCurrentPrice.Amount)
             {
-                throw new ArgumentException("Il prezzo corrente deve essere superiore a quello scontato");
+                throw new ArgumentException("Full price can't be less than the current price");
             }
             FullPrice = newFullPrice;
-            CurrentPrice = newDiscountPrice;
+            CurrentPrice = newCurrentPrice;
         }
+
+        public void ChangeEmail(string newEmail)
+        {
+            if (string.IsNullOrEmpty(newEmail))
+            {
+                throw new ArgumentException("Email can't be empty");
+            }
+            Email = newEmail;
+        }
+
+        public void ChangeDescription(string newDescription)
+        {
+            if (newDescription != null)
+            {
+                if (newDescription.Length < 20)
+                {
+                    throw new Exception("Description is too short");
+                }
+                else if (newDescription.Length > 4000)
+                {
+                    throw new Exception("Description is too long");
+                }
+            }
+            Description = newDescription;
+        }
+
+        public virtual ICollection<Lesson> Lessons { get; private set; }
     }
 }

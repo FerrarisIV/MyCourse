@@ -5,7 +5,9 @@ namespace MyCourse.Models.ValueTypes
 {
     public class Money
     {
-        public Money() : this(Currency.EUR, 0.00m){}
+        public Money() : this(Currency.EUR, 0.00m)
+        {
+        }
         public Money(Currency currency, decimal amount)
         {
             Amount = amount;
@@ -46,7 +48,7 @@ namespace MyCourse.Models.ValueTypes
         
         public override string ToString()
         {
-            return $"{Currency} {Amount:#.00}";
+            return $"{Currency} {Amount:0.00}";
         }
     }
 }
