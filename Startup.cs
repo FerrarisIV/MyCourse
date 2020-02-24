@@ -9,6 +9,7 @@ using MyCourse.Models.Services.Infrastructure;
 using MyCourse.Models.Options;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.AspNetCore.Mvc;
+using MyCourse.Customizations.ModelBinders;
 
 namespace MyCourse
 {
@@ -36,6 +37,8 @@ namespace MyCourse
 
                     Configuration.Bind("ResponseCache:Home", homeProfile);
                     options.CacheProfiles.Add("Home", homeProfile);
+
+                    options.ModelBinderProviders.Insert(0, new DecimalModelBinderProvider());
                 }
             )
             #if DEBUG
