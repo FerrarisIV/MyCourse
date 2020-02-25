@@ -10,7 +10,7 @@ using MyCourse.Models.ViewModels;
 using MyCourse.Models.InputModels;
 using MyCourse.Models.Exceptions;
 using Microsoft.Data.Sqlite;
-using Microsoft.Extensions.Logging;
+using System.Linq.Dynamic.Core;
 
 namespace MyCourse.Models.Services.Application
 {    
@@ -86,51 +86,17 @@ namespace MyCourse.Models.Services.Application
 
         public async Task<ListViewModel<CourseViewModel>> GetCoursesAsync(CourseListInputModel model)
         {
-            IQueryable<Course> baseQuery = dbContext.Courses;
-            
-            switch(model.OrderBy)
+            string orderby = model.OrderBy;
+            if (orderby == "CurrentPrice")
             {
-                case "Title":
-                    if (model.Ascending)
-                    {
-                        baseQuery = baseQuery.OrderBy(course => course.Title);
-                    }
-                    else
-                    {
-                        baseQuery = baseQuery.OrderByDescending(course => course.Title);
-                    }
-                    break;
-                case "Rating":
-                    if (model.Ascending)
-                    {
-                        baseQuery = baseQuery.OrderBy(course => course.Rating);
-                    }
-                    else
-                    {
-                        baseQuery = baseQuery.OrderByDescending(course => course.Rating);
-                    }
-                    break;
-                case "CurrentPrice":
-                    if (model.Ascending)
-                    {
-                        baseQuery = baseQuery.OrderBy(course => course.CurrentPrice.Amount);
-                    }
-                    else
-                    {
-                        baseQuery = baseQuery.OrderByDescending(course => course.CurrentPrice.Amount);
-                    }
-                    break;
-                case "Id":
-                    if (model.Ascending)
-                    {
-                        baseQuery = baseQuery.OrderBy(course => course.Id);
-                    }
-                    else
-                    {
-                        baseQuery = baseQuery.OrderByDescending(course => course.Id);
-                    }
-                    break;
+                orderby = "CurrentPrice.Amount";
             }
+            string direction = model.Ascending ? "asc" : "desc";
+
+            IQueryable<Course> baseQuery = dbContext.Courses.OrderBy($"{orderby} {direction}") ;
+            
+            // model.OrderBy model.Ascending
+            
             
             IQueryable<CourseViewModel> queryLink = baseQuery
                 .Select(course => new CourseViewModel {
