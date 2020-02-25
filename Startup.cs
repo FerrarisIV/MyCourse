@@ -10,6 +10,7 @@ using MyCourse.Models.Options;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.AspNetCore.Mvc;
 using MyCourse.Customizations.ModelBinders;
+using AutoMapper;
 
 namespace MyCourse
 {
@@ -46,6 +47,8 @@ namespace MyCourse
             #endif
             ;
 
+            
+            services.AddAutoMapper(typeof(Startup)); //services.AddAutoMapper();
             services.AddTransient<ICourseService, AdoNetCourseService>();
             //services.AddTransient<ICourseService, EfCoreCourseService>();
             services.AddTransient<IDatabaseAccessor, SqliteDatabaseAccessor>();

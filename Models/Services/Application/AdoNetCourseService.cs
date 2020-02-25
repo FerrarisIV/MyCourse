@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -19,8 +20,10 @@ namespace MyCourse.Models.Services.Application
         private readonly ILogger<AdoNetCourseService> logger;
         private readonly IDatabaseAccessor db;
         private readonly IOptionsMonitor<CoursesOptions> coursesOptions;
-        public AdoNetCourseService(ILogger<AdoNetCourseService> logger, IDatabaseAccessor db, IOptionsMonitor<CoursesOptions> coursesOptions)
+        private readonly IMapper mapper;
+        public AdoNetCourseService(IDatabaseAccessor db, IMapper mapper, ILogger<AdoNetCourseService> logger, IOptionsMonitor<CoursesOptions> coursesOptions)
         {
+            this.mapper = mapper;
             this.coursesOptions = coursesOptions;
             this.logger = logger;
             this.db = db;
@@ -42,17 +45,18 @@ namespace MyCourse.Models.Services.Application
                 throw new CourseNotFoundException(id);
             }
             var courseRow = courseTable.Rows[0];
-            var courseDetailViewModel = CourseDetailViewModel.FromDataRow(courseRow);
+            //var courseDetailViewModel = CourseDetailViewModel.FromDataRow(courseRow);
+            var CourseDetailViewModel = mapper.Map<CourseDetailViewModel>(courseRow);
 
             //Course lessons
             var lessonDataTable = dataSet.Tables[1];
-
-            foreach (DataRow lessonRow in lessonDataTable.Rows)
-            {
-                LessonViewModel lessonViewModel = LessonViewModel.FromDataRow(lessonRow);
-                courseDetailViewModel.Lessons.Add(lessonViewModel);
-            }
-            return courseDetailViewModel;
+            //foreach (DataRow lessonRow in lessonDataTable.Rows)
+            //{
+                //LessonViewModel lessonViewModel = LessonViewModel.FromDataRow(lessonRow);
+                //courseDetailViewModel.Lessons.Add(lessonViewModel);
+            //}
+            CourseDetailViewModel.Lessons = mapper.Map<List<LessonViewModel>>(lessonDataTable.Rows);
+            return CourseDetailViewModel;
         }
 
         public async Task<List<CourseViewModel>> GetBestRatingCoursesAsync()
@@ -65,10 +69,10 @@ namespace MyCourse.Models.Services.Application
                 limit: coursesOptions.CurrentValue.InHome,
                 orderOptions: coursesOptions.CurrentValue.Order);
 
-                ListViewModel<CourseViewModel> result = await GetCoursesAsync(inputModel);
-                return result.Results;
+            ListViewModel<CourseViewModel> result = await GetCoursesAsync(inputModel);
+            return result.Results;
         }
-        
+
         public async Task<List<CourseViewModel>> GetMostRecentCoursesAsync()
         {
             CourseListInputModel inputModel = new CourseListInputModel(
@@ -79,16 +83,16 @@ namespace MyCourse.Models.Services.Application
                 limit: coursesOptions.CurrentValue.InHome,
                 orderOptions: coursesOptions.CurrentValue.Order);
 
-                ListViewModel<CourseViewModel> result = await GetCoursesAsync(inputModel);
-                return result.Results;
+            ListViewModel<CourseViewModel> result = await GetCoursesAsync(inputModel);
+            return result.Results;
         }
 
         public async Task<ListViewModel<CourseViewModel>> GetCoursesAsync(CourseListInputModel model)
         {
             string orderby = model.OrderBy == "CurrentPrice" ? "CurrentPrice_Amount" : model.OrderBy;
             string direction = model.Ascending ? "ASC" : "DESC";
-                                    
-            FormattableString query = $@"SELECT Id, Title, ImagePath, Author, Rating, FullPrice_Amount, FullPrice_Currency, CurrentPrice_Amount, CurrentPrice_Currency FROM Courses WHERE Title LIKE {"%" + model.Search + "%"} ORDER BY {(Sql) orderby} {(Sql) direction} LIMIT {model.Limit} OFFSET {model.Offset}; 
+
+            FormattableString query = $@"SELECT Id, Title, ImagePath, Author, Rating, FullPrice_Amount, FullPrice_Currency, CurrentPrice_Amount, CurrentPrice_Currency FROM Courses WHERE Title LIKE {"%" + model.Search + "%"} ORDER BY {(Sql)orderby} {(Sql)direction} LIMIT {model.Limit} OFFSET {model.Offset}; 
             SELECT COUNT(*) FROM Courses WHERE Title LIKE {"%" + model.Search + "%"}";
             DataSet dataSet = await db.QueryAsync(query);
             var dataTable = dataSet.Tables[0];
