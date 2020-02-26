@@ -86,49 +86,18 @@ namespace MyCourse.Models.Services.Application
         {
             IQueryable<Course> baseQuery = dbContext.Courses;
             
-            switch(model.OrderBy)
+            baseQuery = (model.OrderBy, model.Ascending) switch
             {
-                case "Title":
-                    if (model.Ascending)
-                    {
-                        baseQuery = baseQuery.OrderBy(course => course.Title);
-                    }
-                    else
-                    {
-                        baseQuery = baseQuery.OrderByDescending(course => course.Title);
-                    }
-                    break;
-                case "Rating":
-                    if (model.Ascending)
-                    {
-                        baseQuery = baseQuery.OrderBy(course => course.Rating);
-                    }
-                    else
-                    {
-                        baseQuery = baseQuery.OrderByDescending(course => course.Rating);
-                    }
-                    break;
-                case "CurrentPrice":
-                    if (model.Ascending)
-                    {
-                        baseQuery = baseQuery.OrderBy(course => course.CurrentPrice.Amount);
-                    }
-                    else
-                    {
-                        baseQuery = baseQuery.OrderByDescending(course => course.CurrentPrice.Amount);
-                    }
-                    break;
-                case "Id":
-                    if (model.Ascending)
-                    {
-                        baseQuery = baseQuery.OrderBy(course => course.Id);
-                    }
-                    else
-                    {
-                        baseQuery = baseQuery.OrderByDescending(course => course.Id);
-                    }
-                    break;
-            }
+                ("Title", true) => baseQuery.OrderBy(course => course.Title),
+                ("Title", false) => baseQuery.OrderByDescending(course => course.Title),
+                ("Rating", true) => baseQuery.OrderBy(course => course.Rating),
+                ("Rating", false) => baseQuery.OrderByDescending(course => course.Rating),
+                ("CurrentPrice", true) => baseQuery.OrderBy(course => course.CurrentPrice),
+                ("CurrentPrice", false) => baseQuery.OrderByDescending(course => course.CurrentPrice),
+                ("Id", true) => baseQuery.OrderBy(course => course.Id),
+                ("Id", false) => baseQuery.OrderByDescending(course => course.Id),
+                _ => baseQuery
+            };
             
             IQueryable<CourseViewModel> queryLink = baseQuery
                 .Select(course => new CourseViewModel {
