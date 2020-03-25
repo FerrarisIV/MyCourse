@@ -22,7 +22,6 @@ namespace MyCourse.Models.InputModels
             Limit = Math.Max(1, limit);
             OrderBy = orderby;
             Ascending = ascending;
-
             Offset = (Page - 1) * Limit;
         }
         public string Search { get; }
