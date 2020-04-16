@@ -3,6 +3,7 @@ using MyCourse.Models.ViewModels;
 
 namespace MyCourse.Customizations.ViewComponents
 {
+    //[ViewComponent(Name = "BarraPaginazione")]
     public class PaginationBarViewComponent : ViewComponent
     {
         //public IViewComponentResult Invoke(CourseListViewModel model)
