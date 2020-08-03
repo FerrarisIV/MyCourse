@@ -13,14 +13,16 @@ using Microsoft.Data.Sqlite;
 using System.Linq.Dynamic.Core;
 
 namespace MyCourse.Models.Services.Application
-{    
+{
     public class EfCoreCourseService : ICourseService
     {
         private readonly MyCourseDbContext dbContext;
         private readonly IOptionsMonitor<CoursesOptions> coursesOptions;
+        private readonly IImagePersister imagePersister;
 
-        public EfCoreCourseService(MyCourseDbContext dbContext, IOptionsMonitor<CoursesOptions> coursesOptions)
+        public EfCoreCourseService(MyCourseDbContext dbContext, IImagePersister imagePersister, IOptionsMonitor<CoursesOptions> coursesOptions)
         {
+            this.imagePersister = imagePersister;
             this.coursesOptions = coursesOptions;
             this.dbContext = dbContext;
         }
@@ -66,10 +68,10 @@ namespace MyCourse.Models.Services.Application
                 limit: coursesOptions.CurrentValue.InHome,
                 orderOptions: coursesOptions.CurrentValue.Order);
 
-                ListViewModel<CourseViewModel> result = await GetCoursesAsync(inputModel);
-                return result.Results;
+            ListViewModel<CourseViewModel> result = await GetCoursesAsync(inputModel);
+            return result.Results;
         }
-        
+
         public async Task<List<CourseViewModel>> GetMostRecentCoursesAsync()
         {
             CourseListInputModel inputModel = new CourseListInputModel(
@@ -80,8 +82,8 @@ namespace MyCourse.Models.Services.Application
                 limit: coursesOptions.CurrentValue.InHome,
                 orderOptions: coursesOptions.CurrentValue.Order);
 
-                ListViewModel<CourseViewModel> result = await GetCoursesAsync(inputModel);
-                return result.Results;
+            ListViewModel<CourseViewModel> result = await GetCoursesAsync(inputModel);
+            return result.Results;
         }
 
         public async Task<ListViewModel<CourseViewModel>> GetCoursesAsync(CourseListInputModel model)
@@ -93,13 +95,14 @@ namespace MyCourse.Models.Services.Application
             }
             string direction = model.Ascending ? "asc" : "desc";
 
-            IQueryable<Course> baseQuery = dbContext.Courses.OrderBy($"{orderby} {direction}") ;
-            
+            IQueryable<Course> baseQuery = dbContext.Courses.OrderBy($"{orderby} {direction}");
+
             // model.OrderBy model.Ascending
-            
-            
+
+
             IQueryable<CourseViewModel> queryLink = baseQuery
-                .Select(course => new CourseViewModel {
+                .Select(course => new CourseViewModel
+                {
                     Id = course.Id,
                     Title = course.Title,
                     ImagePath = course.ImagePath,
@@ -166,6 +169,9 @@ namespace MyCourse.Models.Services.Application
             course.ChangeDescription(inputModel.Description);
             course.ChangeEmail(inputModel.Email);
 
+            string imagePath = await imagePersister.SaveCourseImageAsync(inputModel.Id, inputModel.Image);
+            course.ChangeImagePath(imagePath);
+
             //dbContext.Update(course);
 
             try
@@ -181,7 +187,7 @@ namespace MyCourse.Models.Services.Application
         }
 
         public async Task<bool> IsTitleAvailableAsync(string title, int id)
-        {            
+        {
             bool titleExists = await dbContext.Courses.AnyAsync(course => EF.Functions.Like(course.Title, title) && course.Id != id);
             return !titleExists;
         }

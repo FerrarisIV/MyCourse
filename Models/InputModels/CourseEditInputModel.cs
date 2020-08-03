@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyCourse.Controllers;
 using MyCourse.Models.Entities;
@@ -22,12 +23,12 @@ namespace MyCourse.Models.InputModels
          Remote(action: nameof(CoursesController.IsTitleAvailable), controller: "Courses", ErrorMessage = "Il titolo esiste già", AdditionalFields = "Id"),
          Display(Name = "Titolo")]
         public string Title { get; set; }
-        
+
         [MinLength(10, ErrorMessage = "La descrizione dev'essere di almeno {1} caratteri"),
          MaxLength(4000, ErrorMessage = "La descrizione dev'essere di massimo {1} caratteri"),
          Display(Name = "Descrizione")]
         public string Description { get; set; }
-        
+
         [Display(Name = "Immagine rappresentativa")]
         public string ImagePath { get; set; }
 
@@ -35,6 +36,10 @@ namespace MyCourse.Models.InputModels
          EmailAddress(ErrorMessage = "Devi inserire un indirizzo email"),
          Display(Name = "Email di contatto")]
         public string Email { get; set; }
+
+        [Display(Name = "nuova immagine...")]
+        public IFormFile Image { get; set; }
+
 
         [Required(ErrorMessage = "Il prezzo intero è obbligatorio"),
          Display(Name = "Prezzo intero")]
@@ -48,11 +53,11 @@ namespace MyCourse.Models.InputModels
         {
             if (FullPrice.Currency != CurrentPrice.Currency)
             {
-                yield return new ValidationResult("Il prezzo intero deve avere la stessa valuta del prezzo corrente", new [] { nameof(FullPrice) });
+                yield return new ValidationResult("Il prezzo intero deve avere la stessa valuta del prezzo corrente", new[] { nameof(FullPrice) });
             }
             else if (FullPrice.Amount < CurrentPrice.Amount)
             {
-                yield return new ValidationResult("Il prezzo intero non può essere inferiore al prezzo corrente", new [] { nameof(FullPrice) });
+                yield return new ValidationResult("Il prezzo intero non può essere inferiore al prezzo corrente", new[] { nameof(FullPrice) });
             }
         }
 
@@ -79,7 +84,8 @@ namespace MyCourse.Models.InputModels
 
         public static CourseEditInputModel FromEntity(Course course)
         {
-            return new CourseEditInputModel {
+            return new CourseEditInputModel
+            {
                 Id = course.Id,
                 Title = course.Title,
                 Description = course.Description,

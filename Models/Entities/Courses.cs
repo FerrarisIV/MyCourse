@@ -9,11 +9,11 @@ namespace MyCourse.Models.Entities
     {
         public Course(string title, string author)
         {
-		    if (string.IsNullOrWhiteSpace(title))
+            if (string.IsNullOrWhiteSpace(title))
             {
                 throw new ArgumentException("The course must have a title");
             }
-			if (string.IsNullOrWhiteSpace(author))
+            if (string.IsNullOrWhiteSpace(author))
             {
                 throw new ArgumentException("The course must have an author");
             }
@@ -86,6 +86,10 @@ namespace MyCourse.Models.Entities
                 }
             }
             Description = newDescription;
+        }
+        public void ChangeImagePath(string newImagePath)
+        {
+            ImagePath = newImagePath;
         }
 
         public virtual ICollection<Lesson> Lessons { get; private set; }

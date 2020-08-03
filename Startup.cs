@@ -15,7 +15,7 @@ namespace MyCourse
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration) 
+        public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
@@ -25,10 +25,10 @@ namespace MyCourse
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            
+
             services.AddResponseCaching();
 
-            services.AddMvc(options => 
+            services.AddMvc(options =>
                 {
                     var homeProfile = new CacheProfile();
                     //homeProfile.Duration = Configuration.GetValue<int>("ResponseCache:Home:Duration");
@@ -41,26 +41,28 @@ namespace MyCourse
                     options.ModelBinderProviders.Insert(0, new DecimalModelBinderProvider());
                 }
             )
-            #if DEBUG
+#if DEBUG
             .AddRazorRuntimeCompilation()
-            #endif
+#endif
             ;
 
             //services.AddTransient<ICourseService, AdoNetCourseService>();
             services.AddTransient<ICourseService, EfCoreCourseService>();
+            services.AddTransient<IImagePersister, InsecureImagePersister>();
             services.AddTransient<IDatabaseAccessor, SqliteDatabaseAccessor>();
             //services.AddTransient<ICachedCourseService, MemoryCacheCourseService>();
 
-            
-            
+
+
             //services.AddDbContext<MyCourseDbContext>();
-            services.AddDbContextPool<MyCourseDbContext>(optionsBuilder => {
+            services.AddDbContextPool<MyCourseDbContext>(optionsBuilder =>
+            {
                 string connectionString = Configuration.GetSection("ConnectionStrings").GetValue<string>("Default");
                 optionsBuilder.UseSqlite(connectionString);
             });
 
-            
-                
+
+
 
             //Options
             services.Configure<ConnectionStringsOptions>(Configuration.GetSection("ConnectionStrings"));
@@ -73,8 +75,8 @@ namespace MyCourse
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
-            {     
-                app.UseExceptionHandler("/Error");           
+            {
+                app.UseExceptionHandler("/Error");
                 //app.UseDeveloperExceptionPage();
                 //app.UseHttpsRedirection();
             }
@@ -83,7 +85,7 @@ namespace MyCourse
                 app.UseExceptionHandler("/Error");
             }
 
-            app.UseStaticFiles();            
+            app.UseStaticFiles();
             app.UseRouting();
             app.UseResponseCaching();
 
@@ -91,7 +93,7 @@ namespace MyCourse
             {
                 routeBuilder.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
                 //routeBuilder.MapRazorPages();
-            });    
+            });
         }
     }
 }
